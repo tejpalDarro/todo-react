@@ -1,47 +1,57 @@
-import { useState } from 'react'
+// import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom'
 import './TodoApp.css'
+import LoginComponent from './LoginComponent'
+import WelcomeComponent from './WelcomeComponent'
+import ErrorComponent from './ErrorComponent'
+import ListTodosComponent from './ListTodosComponent'
+import HeaderComponent from './HeaderComponent'
+import LogoutComponent from './LogoutComponent'
+import FooterComponent from './FooterComponent'
+import AuthProvider, { useAuth } from './AuthContext'
+
+function AuthenticatedRoute( {children} ) {
+    const authContext = useAuth
+
+    if (authContext.isAuthenticated) {
+        return children
+    }
+    return <Navigate to='/login' />
+}
+
 export default function TodoApp() {
+
     return (
         <div className="TodoApp">
-            <LoginComponent />
-        </div>
-    )
-}
-function LoginComponent() {
+            <AuthProvider>
+                <BrowserRouter>
+                <HeaderComponent />
+                    <Routes>
+                        <Route path='' element={ <LoginComponent /> }></Route>
+                        <Route path='/login' element={ <LoginComponent /> }></Route>
+                        <Route path='/welcome/:username' element={
+                            <AuthenticatedRoute>
+                                <WelcomeComponent /> 
+                            </AuthenticatedRoute>
+                             }></Route>
+                        <Route path='/todos' element={ 
+                        <AuthenticatedRoute>
+                            <ListTodosComponent />
+                        </AuthenticatedRoute>
+                        }></Route>
+                        <Route path='/logout' element={
+                            <AuthenticatedRoute>
+                                <LogoutComponent />
+                            </AuthenticatedRoute>
+                             } />
 
-    const [username, setUsername] = useState('phenol')
-    const [password, setPassword] = useState('')
+                        <Route path='*' element={ <ErrorComponent/> }></Route>
 
-    function handleUsernameChange(event) {
-        setUsername(event.target.value)
-    }
+                    </Routes>
+                <FooterComponent/>
+                </BrowserRouter>
+            </AuthProvider>
 
-    function handlePasswordChange(event) {
-        setPassword(event.target.value)
-    }
-    return (
-        <div className="Welcome">
-            <div className="LoginForm">
-                <div>
-                    <label>UserName</label>
-                    <input type="text" name="username" value={username} onChange={handleUsernameChange}/>
-                </div>
-                <div>
-                    <label>Password</label>
-                    <input type="password" name="password" value={password} onChange={handlePasswordChange} />
-                </div>
-                <div>
-                    <button type="button" name="login">login</button>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-function WelcomeComponent() {
-    return (
-        <div className="Login">
-            Welcome Component
         </div>
     )
 }
