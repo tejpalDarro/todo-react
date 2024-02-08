@@ -23,14 +23,9 @@ export default function LoginComponent() {
     }
 
     function handleSubmit() {
-        if (username === 'tejpal' && password === '123') {
-            authContext.setAuthenticated(true)
-            setSuccess(true)
-            setError(false)
+        if (authContext.login(username, password)) {
             navigate(`/welcome/${username}`)
-            // navigate('/welcome/tejpal')
         } else {
-            setSuccess(false)
             setError(true)
         }
     }
